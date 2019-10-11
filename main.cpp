@@ -1,208 +1,183 @@
-﻿#pragma once
+﻿/* =============================================================
+	INTRODUCTION TO GAME PROGRAMMING SE102
+
+	SAMPLE 01 - SKELETON CODE
+
+	This sample illustrates how to:
+
+	1/ Re-Organize intro code to allow better scalability
+================================================================ */
+
+#include <windows.h>
 #include <d3d9.h>
-#include <Windows.h>
+#include <d3dx9.h>
 
-#define WIDTH 320
-#define HEIGHT 640
-#define TITLE "GAME"
+#include "debug.h"
+#include "Game.h"
 
-class Game
+#define WINDOW_CLASS_NAME L"SampleWindow"
+#define MAIN_WINDOW_TITLE L"01 - Skeleton"
+
+#define BRICK_TEXTURE_PATH L"brick.png"
+#define MARIO_TEXTURE_PATH L"mario.png"
+#define BALL_TEXTURE_PATH L"ball.png"
+
+
+#define BACKGROUND_COLOR D3DCOLOR_XRGB(255, 0, 0)
+#define SCREEN_WIDTH 640
+#define SCREEN_HEIGHT 480
+
+#define MAX_FRAME_RATE 60
+
+Game *game;
+
+LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-private:
-	//Các thuộc tính quy định chiều dài và rộng của cửa sổ Game
-	int m_Width;
-	int m_Height;
-	//Quy định cửa sổ sẽ hiển thị window hoặc full màn hình.
-	bool m_Iswindow;
-
-	//HINSTANCE là 1 biến để đại diện cho game của chúng ta khi được hệ điều hành chạy.
-	HINSTANCE m_HandleInstance;
-	//Mỗi game sẽ có thể chứa nhiều cửa sổ, mỗi cửa sổ cần có 1 định danh riêng. Định danh đó chính là HWND.
-	HWND m_HandleWindow;
-	//LPDIRECT3D9 là một Direct3D Object. Biến này cần thiết cho việc khởi tạo Device để thao tác vẽ trong Game.
-	LPDIRECT3D9 m_lpDirect3D;
-	// LPDIRECT3DDEVICE9 dùng để lưu thông tin của Device sử dụng thao tác vẽ trong chương trình.
-	LPDIRECT3DDEVICE9 m_lpDirect3DDevice;
-
-	//Đây là hàm callback dùng để lắng nghe các sự kiện của cửa sổ Game khi người dùng tương tác.
-	static LRESULT CALLBACK WndProcedure(HWND hWnd,
-		UINT message, WPARAM wParam, LPARAM lParam);
-public:
-	// Hàm tạo của GameObject.
-	Game(int scr_Widht, int scr_Height, bool isWindow);
-
-	//Khởi tạo các thuộc tính cần thiết cho cửa sổ.
-	bool initHandleWindow();
-	//Khởi tạo môi trường DirectX
-	bool initDirectX3DEnvironment();
-	//Khởi tạo Direct Device
-	bool initDirectX3DDevice();
-
-	//Nơi để đặt tất cả các hàm khởi tạo cần thiết trước lúc chương trình chạy.
-	void GameInit();
-	//Cập nhật game
-	void GameRun();
-	//Giải phóng các tài nguyên khi thoát chương trình
-	void GameExit();
-};
-//Ta khởi tạo các giá trị ban đầu cho ứng dụng.
-Game::Game(int scr_Widht, int scr_Height, bool isWindow)
-{
-	this->m_Width = scr_Widht;
-	this->m_Height = scr_Height;
-	this->m_Iswindow = isWindow;
-	this->m_HandleInstance = 0;
-	this->m_HandleWindow = 0;
-	this->m_lpDirect3D = 0;
-	this->m_lpDirect3DDevice = 0;
-
-}
-
-//Ở class này sẽ khởi tạo các thuộc tính cần thiết cho cửa sổ. Giúp cửa sổ hiển thị và đăng ký các sự kiện khi người dùng thao tác với cửa sổ.
-bool Game::initHandleWindow()
-{
-	WNDCLASSEX WndcEx;
-	ZeroMemory(&WndcEx, sizeof(WndcEx));
-	WndcEx.cbSize = sizeof(WNDCLASSEX);
-	WndcEx.hInstance = this->m_HandleInstance;
-	WndcEx.lpfnWndProc = (WNDPROC)WndProcedure;
-	WndcEx.lpszClassName = "Game";
-	if (!RegisterClassEx(&WndcEx))
-	{
-		return false;
-	}
-	this->m_HandleWindow = CreateWindow(
-		"Game", // đặt trung với WndcEx.lpszClassName
-		TITLE, // TITLE của cửa sổ 
-		WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX, // style của cửa sổ
-		100, // tọa độ x khi cửa sổ xuất hiện
-		100, // tọa độ y khi cửa sổ xuất hiện
-		this->m_Width, // chiều dài cửa sổ
-		this->m_Height, // chiều cao cửa sổ
-		0, // handle window parent của của sổ hiện tại. Để là 0
-		0, // handle đến Menu. Để là 0
-		this->m_HandleInstance, // Handle Instance của ứng dụng
-		0); // giữ nguyên theo default là 0
-	if (!this->m_HandleWindow) // Kiểm tra tạo thành công.
-	{
-		return false;
-	}
-	ShowWindow(m_HandleWindow, SW_SHOW); // show cửa sổ lên màn hình
-	UpdateWindow(m_HandleWindow); // Update cửa sổ theo thời gian
-	return true;
-}
-
-//Hàm này tác dụng khởi tạo đối tượng Direct3D. Ta sẽ cần đối tượng này để làm việc với DirectX ở các bài viết sau.
-bool Game::initDirectX3DEnvironment()
-{
-	this->m_lpDirect3D = Direct3DCreate9(D3D_SDK_VERSION);
-	if (m_lpDirect3D) {
-		return true;
-	}
-	return false;
-}
-
-
-//Ở hàm này chúng ta cần dùng D3DPRESENT_PARAMETERS để thao tác tạo Direct3D Device. Direct3D Device này sẽ dùng cho việc vẽ các Object Game lên màn hình sau này.
-bool Game::initDirectX3DDevice()
-{
-	D3DPRESENT_PARAMETERS d3dpp; // khai báo biến
-	ZeroMemory(&d3dpp, sizeof(d3dpp)); // Khởi tạo vùng nhớ
-	d3dpp.BackBufferCount = 1; // Số lượng Back buffer
-	d3dpp.BackBufferFormat = D3DFMT_UNKNOWN; // Chọn UNKNOW, DirectX sẽ tự chọn 1 định dạng phù hợp cho Device
-	d3dpp.BackBufferHeight = HEIGHT; // chiều cao cảu BackBuffer
-	d3dpp.BackBufferWidth = WIDTH; // Chiều dài của BackBuffer
-	d3dpp.Windowed = true; // Window ở dạng cửa sổ, không phải full màn hình
-	d3dpp.hDeviceWindow = this->m_HandleWindow; // Gán HandleWindow cho Device
-	d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD; // Phương thức swap của Buffer
-	m_lpDirect3D->CreateDevice(
-		D3DADAPTER_DEFAULT, // Chọn DEFAULT ADAPTER
-		D3DDEVTYPE_HAL, // 
-		m_HandleWindow, // Handle Window của của sổ
-		D3DCREATE_HARDWARE_VERTEXPROCESSING, // Hard ware vertex processing
-		&d3dpp,
-		&m_lpDirect3DDevice); // Hàm tạo Device
-	if (FAILED(m_lpDirect3DDevice))
-	{
-		return false;
-	}
-	return true;
-}
-
-//Hàm này sẽ gọi các hàm khởi tạo ở trên
-void Game::GameInit()
-{
-	initHandleWindow();
-	initDirectX3DEnvironment();
-	initDirectX3DDevice();
-}
-
-
-//Ở hàm này chúng ta sẽ thực hiện toàn bộ Update của Game. Sẽ sử dụng dòng while để duy trì cửa sổ luôn hoạt động trong quá trình chạy Game.
-void Game::GameRun()
-{
-	MSG msg;
-	ZeroMemory(&msg, sizeof(msg)); // Tạo một Mesage để lắng nghe các sự kiện của cửa sổ
-	while (true)
-	{
-		if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE)) // Lấy message và truyền vào biến msg đã khai báo
-		{
-			if (msg.message == WM_QUIT) // Kiểm tra nếu msg yêu cầu QUIT ứng dụng thì ứng dụng sẽ thoát
-				break;
-			TranslateMessage(&msg); // xử lý input và chuyển vào msg
-			DispatchMessage(&msg); // gửi message đến hàm WndProceduce để xử lý
-		}
-		else
-		{
-			// Begin Draw something in Game
-			m_lpDirect3DDevice->Clear(0, 0, D3DCLEAR_TARGET, D3DCOLOR_XRGB(100, 100, 100), 1.0f, 0); // Clear cửa sổ 1 lần trước khi vẽ lên
-			if (m_lpDirect3DDevice->BeginScene())
-			{
-
-				// Game Render Here
-				m_lpDirect3DDevice->EndScene();
-			}
-			m_lpDirect3DDevice->Present(0, 0, 0, 0); // Thể hiện tất cả những gì đã vẽ lên màn hình
-		}
-	}
-}
-
-//Giải phóng vùng nhớ khi thoát game
-void Game::GameExit()
-{
-	if (this->m_lpDirect3D) {
-		this->m_lpDirect3D->Release();
-		this->m_lpDirect3D = NULL;
-	}
-	if (this->m_lpDirect3DDevice) {
-		this->m_lpDirect3DDevice->Release();
-		this->m_lpDirect3DDevice = NULL;
-	}
-}
-
-//Hàm nhận các sự kiện của cửa sổ và xử lý ở đây. Ví dụ khi nhận sự kiện WM_DESTROY thì cửa sổ sẽ đóng xuống.
-
-LRESULT CALLBACK Game::WndProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-	switch (message)
-	{
+	switch (message) {
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;
+	default:
+		return DefWindowProc(hWnd, message, wParam, lParam);
 	}
-	return DefWindowProc(hWnd, message, wParam, lParam);
+
+	return 0;
 }
 
-
-int WINAPI WinMain(
-	HINSTANCE hInstance,
-	HINSTANCE hPrevInstace,
-	LPSTR lpStrCmdLine,
-	int nShowCmd)
+/*
+	Load all game resources. In this example, create a brick object and mario object
+*/
+void LoadResources()
 {
-	Game mygame(WIDTH, HEIGHT, false);
-	mygame.GameInit();
-	mygame.GameRun();
-	mygame.GameExit();
+	
+}
+
+/*
+	Update world status for this frame
+	dt: time period between beginning of last frame and beginning of this frame
+*/
+void Update(DWORD dt)
+{
+	
+}
+
+/*
+	Render a frame
+*/
+void Render()
+{
+	LPDIRECT3DDEVICE9 d3ddv = game->GetDirect3DDevice();
+	LPDIRECT3DSURFACE9 bb = game->GetBackBuffer();
+	LPD3DXSPRITE spriteHandler = game->GetSpriteHandler();
+
+	if (d3ddv->BeginScene())
+	{
+		// Clear back buffer with a color
+		d3ddv->ColorFill(bb, NULL, BACKGROUND_COLOR);
+
+		spriteHandler->Begin(D3DXSPRITE_ALPHABLEND);
+		
+
+		spriteHandler->End();
+		d3ddv->EndScene();
+	}
+
+	// Display back buffer content to the screen
+	d3ddv->Present(NULL, NULL, NULL, NULL);
+}
+
+HWND CreateGameWindow(HINSTANCE hInstance, int nCmdShow, int ScreenWidth, int ScreenHeight)
+{
+	WNDCLASSEX wc;
+	wc.cbSize = sizeof(WNDCLASSEX);
+
+	wc.style = CS_HREDRAW | CS_VREDRAW;
+	wc.hInstance = hInstance;
+
+	wc.lpfnWndProc = (WNDPROC)WinProc;
+	wc.cbClsExtra = 0;
+	wc.cbWndExtra = 0;
+	wc.hIcon = NULL;
+	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+	wc.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
+	wc.lpszMenuName = NULL;
+	wc.lpszClassName = WINDOW_CLASS_NAME;
+	wc.hIconSm = NULL;
+
+	RegisterClassEx(&wc);
+
+	HWND hWnd =
+		CreateWindow(
+			WINDOW_CLASS_NAME,
+			MAIN_WINDOW_TITLE,
+			WS_OVERLAPPEDWINDOW, // WS_EX_TOPMOST | WS_VISIBLE | WS_POPUP,
+			CW_USEDEFAULT,
+			CW_USEDEFAULT,
+			ScreenWidth,
+			ScreenHeight,
+			NULL,
+			NULL,
+			hInstance,
+			NULL);
+
+	if (!hWnd)
+	{
+		OutputDebugString(L"[ERROR] CreateWindow failed");
+		DWORD ErrCode = GetLastError();
+		return FALSE;
+	}
+
+	ShowWindow(hWnd, nCmdShow);
+	UpdateWindow(hWnd);
+
+	return hWnd;
+}
+
+int Run()
+{
+	MSG msg;
+	int done = 0;
+	DWORD frameStart = GetTickCount();
+	DWORD tickPerFrame = 1000 / MAX_FRAME_RATE;
+
+	while (!done)
+	{
+		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+		{
+			if (msg.message == WM_QUIT) done = 1;
+
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+
+		DWORD now = GetTickCount();
+
+		// dt: the time between (beginning of last frame) and now
+		// this frame: the frame we are about to render
+		DWORD dt = now - frameStart;
+
+		if (dt >= tickPerFrame)
+		{
+			frameStart = now;
+			Update(dt);
+			Render();
+		}
+		else
+			Sleep(tickPerFrame - dt);
+	}
+
+	return 1;
+}
+
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
+{
+	HWND hWnd = CreateGameWindow(hInstance, nCmdShow, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+	game = Game::GetInstance();
+	game->Init(hWnd);
+
+	LoadResources();
+	Run();
+
 	return 0;
 }
