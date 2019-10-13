@@ -1,35 +1,16 @@
-﻿/* =============================================================
-	INTRODUCTION TO GAME PROGRAMMING SE102
-
-	SAMPLE 01 - SKELETON CODE
-
-	This sample illustrates how to:
-
-	1/ Re-Organize intro code to allow better scalability
-================================================================ */
-
-#include <windows.h>
+﻿#include <windows.h>
 #include <d3d9.h>
 #include <d3dx9.h>
 
 #include "debug.h"
 #include "Game.h"
 #include "define.h"
-//#define WINDOW_CLASS_NAME L"SampleWindow"
-//#define MAIN_WINDOW_TITLE L"Castlevania NES"
-//
-//#define BRICK_TEXTURE_PATH L"brick.png"
-//#define MARIO_TEXTURE_PATH L"mario.png"
-//#define BALL_TEXTURE_PATH L"ball.png"
-//
-//
-//#define BACKGROUND_COLOR D3DCOLOR_XRGB(255, 0, 0)
-//#define SCREEN_WIDTH 640
-//#define SCREEN_HEIGHT 480
-//
-//#define MAX_FRAME_RATE 60
+#include "GameObj.h"
+#include "Textures.h"
 
-Game *game;
+CGame *game;
+CGameObj *simon;
+CGameObj *ground;
 
 LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -49,6 +30,60 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 */
 void LoadResources()
 {
+	CTextures *textures = CTextures::GetInstance();
+	//Simon walking right
+	textures->Add(ID_TEX_SIMON_FLIPPED, SIMON_FLIPPED_TEX_PATH, D3DCOLOR_XRGB(255, 0, 255));
+	//Simon walking left
+	textures->Add(ID_TEX_SIMON, SIMON_TEX_PATH, D3DCOLOR_XRGB(255, 0, 255));
+	//add ground 
+	textures->Add(ID_TEX_GROUND_INTRO, GROUND_INTRO_TEX_PATH, D3DCOLOR_XRGB(128, 0, 255));
+
+	CSprites * sprites = CSprites::GetInstance();
+	CAnimations * animations = CAnimations::GetInstance();
+	LPDIRECT3DTEXTURE9 texSimon = textures->Get(ID_TEX_SIMON);
+	LPDIRECT3DTEXTURE9 texSimon_flipped = textures->Get(ID_TEX_SIMON_FLIPPED);
+	LPDIRECT3DTEXTURE9 texGround = textures->Get(ID_TEX_GROUND_INTRO);
+
+	//Add simon walking right
+	sprites->Add(100, 255, 2, 284, 62, texSimon_flipped);
+	sprites->Add(101, 312, 2, 348, 62, texSimon_flipped);
+	sprites->Add(102, 373, 2, 406, 62, texSimon_flipped);
+	sprites->Add(103, 432, 2, 470, 62, texSimon_flipped);
+	//Add simon walking left
+	sprites->Add(200, 194, 2, 223, 64, texSimon);
+	sprites->Add(201, 132, 2, 169, 64, texSimon);
+	sprites->Add(202, 74, 2, 104, 64, texSimon);
+	sprites->Add(203, 10, 2, 48, 64, texSimon);
+	//Add ground
+	sprites->Add(301, 6, 206, 262, 213, texGround);
+
+	LPANIMATION anim;
+
+	anim = new CAnimation(100);
+	anim->Add(100);
+	anim->Add(101);
+	anim->Add(102);
+	anim->Add(103);
+	animations->Add(ID_ANI_SIMON_WALKING_RIGHT, anim);
+	//
+	anim = new CAnimation(100);
+	anim->Add(200);
+	anim->Add(201);
+	anim->Add(202);
+	anim->Add(203);
+	animations->Add(ID_ANI_SIMON_WALKING_LEFT, anim);
+	//
+	anim = new CAnimation(100);
+	anim->Add(301);
+	animations->Add(20003, anim);
+
+	simon = new CGameObj();
+	simon->AddAnimation(ID_ANI_SIMON_WALKING_RIGHT);
+	simon->AddAnimation(ID_ANI_SIMON_WALKING_LEFT);
+	simon->SetPosition(10.0f, 200.0f);
+	ground = new CGameObj();
+	ground->AddAnimation(20003);
+	ground->SetPosition(0.0f, 260.0f);
 	
 }
 
@@ -58,7 +93,7 @@ void LoadResources()
 */
 void Update(DWORD dt)
 {
-	
+	simon->Update(dt);
 }
 
 /*
@@ -76,8 +111,8 @@ void Render()
 		d3ddv->ColorFill(bb, NULL, BACKGROUND_COLOR);
 
 		spriteHandler->Begin(D3DXSPRITE_ALPHABLEND);
-		
-
+		simon->Render();
+		ground->Render();
 		spriteHandler->End();
 		d3ddv->EndScene();
 	}
@@ -173,7 +208,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 {
 	HWND hWnd = CreateGameWindow(hInstance, nCmdShow, SCREEN_WIDTH, SCREEN_HEIGHT);
 
-	game = Game::GetInstance();
+	game = CGame::GetInstance();
 	game->Init(hWnd);
 
 	LoadResources();

@@ -3,9 +3,9 @@
 #include <d3dx9.h>
 #include <Windows.h>
 
-class Game
+class CGame
 {
-	static Game * __instance;
+	static CGame * __instance;
 	HWND hWnd;									// Window handle
 
 	LPDIRECT3D9 d3d = NULL;						// Direct3D handle
@@ -16,14 +16,14 @@ class Game
 
 public:
 	void Init(HWND hWnd);
-	void Draw(float x, float y, LPDIRECT3DTEXTURE9 texture);
+	void Draw(float x, float y, LPDIRECT3DTEXTURE9 texture, int left, int top, int right, int bottom);
 
 	LPDIRECT3DDEVICE9 GetDirect3DDevice() { return this->d3ddv; }
 	LPDIRECT3DSURFACE9 GetBackBuffer() { return backBuffer; }
 	LPD3DXSPRITE GetSpriteHandler() { return this->spriteHandler; }
 
-	static Game * GetInstance();
+	static CGame * GetInstance();
 
-	~Game();
+	~CGame();
 };
 

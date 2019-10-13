@@ -1,8 +1,8 @@
 ﻿#include "Game.h"
 
-Game * Game::__instance = NULL;
+CGame * CGame::__instance = NULL;
 
-void Game::Init(HWND hWnd)
+void CGame::Init(HWND hWnd)
 {
 	LPDIRECT3D9 d3d = Direct3DCreate9(D3D_SDK_VERSION);
 
@@ -33,7 +33,7 @@ void Game::Init(HWND hWnd)
 
 	if (d3ddv == NULL)
 	{
-		//OutputDebugString(L"[ERROR] CreateDevice failed\n");
+		OutputDebugString(L"[ERROR] CreateDevice failed\n");
 		return;
 	}
 
@@ -42,19 +42,23 @@ void Game::Init(HWND hWnd)
 	// Initialize sprite helper from Direct3DX helper library
 	D3DXCreateSprite(d3ddv, &spriteHandler);
 
-	//OutputDebugString(L"[INFO] InitGame done;\n");
+	OutputDebugString(L"[INFO] InitGame done;\n");
 }
 
 /*
 	Utility function to wrap LPD3DXSPRITE::Draw
 */
-void Game::Draw(float x, float y, LPDIRECT3DTEXTURE9 texture)
+void CGame::Draw(float x, float y, LPDIRECT3DTEXTURE9 texture, int left, int top, int right, int bottom)
 {
 	D3DXVECTOR3 p(x, y, 0);
-	spriteHandler->Draw(texture, NULL, NULL, &p, D3DCOLOR_XRGB(255, 255, 255));
+	RECT r;
+	r.left = left;
+	r.top = top;
+	r.right = right;
+	r.bottom = bottom;
+	spriteHandler->Draw(texture, &r, NULL, &p, D3DCOLOR_XRGB(255, 255, 255));
 }
-
-Game::~Game()
+CGame::~CGame()
 {
 	if (spriteHandler != NULL) spriteHandler->Release();
 	if (backBuffer != NULL) backBuffer->Release();
@@ -63,8 +67,8 @@ Game::~Game()
 }
 
 
-Game *Game::GetInstance()
+CGame *CGame::GetInstance()
 {
-	if (__instance == NULL) __instance = new Game();
+	if (__instance == NULL) __instance = new CGame();
 	return __instance;
 }

@@ -31,6 +31,7 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
+    <UseOfMfc>false</UseOfMfc>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -122,14 +123,24 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CSimon.cpp" />
     <ClCompile Include="debug.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="GameObj.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Sprites.cpp" />
+    <ClCompile Include="StaticObj.cpp" />
+    <ClCompile Include="Textures.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CSimon.h" />
     <ClInclude Include="debug.h" />
     <ClInclude Include="define.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="GameObj.h" />
+    <ClInclude Include="Sprites.h" />
+    <ClInclude Include="StaticObj.h" />
+    <ClInclude Include="Textures.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
