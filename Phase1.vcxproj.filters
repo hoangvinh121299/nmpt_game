@@ -30,13 +30,13 @@
     <ClCompile Include="Sprites.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CSimon.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Textures.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="StaticObj.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Simon.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -56,13 +56,13 @@
     <ClInclude Include="Sprites.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CSimon.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Textures.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="StaticObj.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Simon.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

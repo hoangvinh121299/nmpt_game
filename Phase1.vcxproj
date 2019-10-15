@@ -80,10 +80,11 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <ConformanceMode>true</ConformanceMode>
+      <ConformanceMode>false</ConformanceMode>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;d3d9.lib;d3dx9.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3dx9.lib;d3d9.lib;dxguid.lib;dxerr.lib;dinput8.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -123,7 +124,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="CSimon.cpp" />
+    <ClCompile Include="Simon.cpp" />
     <ClCompile Include="debug.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameObj.cpp" />
@@ -133,7 +134,7 @@
     <ClCompile Include="Textures.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CSimon.h" />
+    <ClInclude Include="Simon.h" />
     <ClInclude Include="debug.h" />
     <ClInclude Include="define.h" />
     <ClInclude Include="Game.h" />

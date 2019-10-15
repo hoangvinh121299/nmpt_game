@@ -25,3 +25,9 @@
 //ID Animation xxxxx
 #define ID_ANI_SIMON_WALKING_LEFT 10001
 #define ID_ANI_SIMON_WALKING_RIGHT 10002
+//Keyboard
+#define DIRECTINPUT_VERSION 0x0800
+#define KEYBOARD_BUFFER_SIZE 1024
+//Camera x, y
+//
+#define SIMON_WALKING_SPEED 0.08f

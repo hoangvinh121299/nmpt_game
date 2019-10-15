@@ -6,11 +6,43 @@
 #include "Game.h"
 #include "define.h"
 #include "GameObj.h"
+#include "Simon.h"
 #include "Textures.h"
 
 CGame *game;
-CGameObj *simon;
-CGameObj *ground;
+CSimon *simon;
+//CGameObj *ground;
+
+//Thao tác với bàn phím
+class CSampleKeyHander : public CKeyEventHandler
+{
+	virtual void KeyState(BYTE *states);
+	virtual void OnKeyDown(int KeyCode);
+	virtual void OnKeyUp(int KeyCode);
+};
+
+CSampleKeyHander * keyHandler;
+
+void CSampleKeyHander::OnKeyDown(int KeyCode)
+{
+	DebugOut(L"[INFO] KeyDown: %d\n", KeyCode);
+	switch (KeyCode)
+	{
+	case DIK_SPACE:
+		break;
+	}
+}
+
+void CSampleKeyHander::OnKeyUp(int KeyCode)
+{
+	DebugOut(L"[INFO] KeyUp: %d\n", KeyCode);
+}
+
+void CSampleKeyHander::KeyState(BYTE *states)
+{
+	if (game->IsKeyDown(DIK_RIGHT));
+}
+
 
 LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -72,19 +104,18 @@ void LoadResources()
 	anim->Add(202);
 	anim->Add(203);
 	animations->Add(ID_ANI_SIMON_WALKING_LEFT, anim);
-	//
+	//Ground anim
 	anim = new CAnimation(100);
 	anim->Add(301);
 	animations->Add(20003, anim);
 
-	simon = new CGameObj();
+	simon = new CSimon();
 	simon->AddAnimation(ID_ANI_SIMON_WALKING_RIGHT);
 	simon->AddAnimation(ID_ANI_SIMON_WALKING_LEFT);
 	simon->SetPosition(10.0f, 200.0f);
-	ground = new CGameObj();
-	ground->AddAnimation(20003);
-	ground->SetPosition(0.0f, 260.0f);
-	
+	//ground = new CGameObj();
+	//ground->AddAnimation(20003);
+	//ground->SetPosition(0.0f, 260.0f);
 }
 
 /*
@@ -112,7 +143,7 @@ void Render()
 
 		spriteHandler->Begin(D3DXSPRITE_ALPHABLEND);
 		simon->Render();
-		ground->Render();
+		//ground->Render();
 		spriteHandler->End();
 		d3ddv->EndScene();
 	}
@@ -194,6 +225,7 @@ int Run()
 		if (dt >= tickPerFrame)
 		{
 			frameStart = now;
+			game->ProcessKeyboard();
 			Update(dt);
 			Render();
 		}
@@ -210,6 +242,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	game = CGame::GetInstance();
 	game->Init(hWnd);
+
+	keyHandler = new CSampleKeyHander();
+	game->InitKeyboard(keyHandler);
 
 	LoadResources();
 	Run();
